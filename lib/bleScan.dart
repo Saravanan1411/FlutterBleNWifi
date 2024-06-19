@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutterblueplus/wifiScan.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'console.dart';
@@ -25,6 +26,7 @@ class _BLEScanState extends State<BLEScan> {
     requestPermissions();
   }
 
+  ///request permissions
   Future<void> requestPermissions() async {
     final status = await [
       Permission.bluetooth,
@@ -44,6 +46,7 @@ class _BLEScanState extends State<BLEScan> {
     }
   }
 
+  /// list connected devices
   void getConnectedDevices() async {
     try {
       List<BluetoothDevice> devices = await FlutterBluePlus.connectedDevices;
@@ -55,7 +58,7 @@ class _BLEScanState extends State<BLEScan> {
       print("Error fetching connected devices: $e");
     }
   }
-
+  ///bluetooth scanning start
   void startScan() async {
     print("Scan Started");
     setState(() {
@@ -103,6 +106,7 @@ class _BLEScanState extends State<BLEScan> {
     print("List: $availableDevicesList");
   }
 
+  ///bluetooth stop scanning
   void stopScan() {
     scanSubscription?.cancel();
     FlutterBluePlus.stopScan();
@@ -111,13 +115,14 @@ class _BLEScanState extends State<BLEScan> {
     });
   }
 
+  ///connect to ble device
   Future<void> _connectToDevice(BluetoothDevice device) async {
     try {
       await device.connect();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Connected to ${device.name}')),
       );
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => TestScreen(bleDevice: device)));
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => WifiScanner(bleDevice: device,)));
       getConnectedDevices();
     } on BluetoothConnectionEvent catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
